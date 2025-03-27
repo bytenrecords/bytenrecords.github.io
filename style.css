@@ -1,0 +1,108 @@
+/* Import Google Font */
+body {
+    font-family: 'Montserrat', sans-serif;
+    padding-top: 56px;
+    scroll-behavior: smooth;
+    background-color: #f8f9fa;
+}
+
+/* Change: Removed #logo-display section styles */
+/*
+#logo-display { ... }
+*/
+
+/* --- Intro CTA Section Styling --- */
+#intro-cta {
+    /* Added top border since logo section is gone */
+    border-top: 1px solid #343a40;
+}
+
+#intro-cta .lead {
+    font-size: 1.25rem;
+    font-weight: 400;
+}
+
+.short-description {
+    color: #adb5bd;
+    font-size: 1.1rem;
+}
+
+
+/* --- Featured Artist Section Styling --- */
+#featured-artist {
+     border-top: 1px solid #dee2e6;
+}
+
+.spotify-embed-container {
+    max-width: 450px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.artist-description .artist-name {
+    margin-bottom: 1rem;
+}
+
+/* --- General & Navbar Adjustments --- */
+.navbar {
+    transition: background-color 0.3s ease;
+}
+
+.nav-link {
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: #ffffff !important;
+}
+
+/* --- Footer Styling --- */
+footer {
+    /* Background color set via bg-dark */
+    border-top: 1px solid #343a40;
+    /* Padding updated via Bootstrap classes pt-5 pb-4 */
+}
+
+/* Change: Styles for the main logo now in the footer */
+.main-logo {
+    max-width: 180px; /* Adjusted size for footer context */
+    height: auto;
+    /* Change: Added rounded corners */
+    border-radius: 15px; /* Adjust pixel value as needed */
+    /* Margin added via Bootstrap class mb-4 */
+}
+
+
+footer p {
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+footer a {
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+footer a:hover {
+    color: #adb5bd;
+}
+
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 767.98px) {
+    /* Adjust logo size in footer for mobile if needed */
+    .main-logo {
+        max-width: 150px;
+    }
+    .display-5 {
+        font-size: 2rem;
+    }
+    .artist-description {
+         text-align: center;
+         margin-top: 2rem;
+    }
+}
