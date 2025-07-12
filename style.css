@@ -91,6 +91,13 @@ footer a:hover {
     color: #adb5bd;
 }
 
+/* Hide Google Translate branding */
+.goog-te-banner-frame.skiptranslate, .goog-te-gadget-simple {
+    display: none !important;
+}
+body > .skiptranslate {
+    display: none !important;
+}
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 767.98px) {
