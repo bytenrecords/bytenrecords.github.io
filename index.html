@@ -44,14 +44,12 @@
                         <a class="nav-link" href="#members">成員</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" id="google_translate_element_trigger">English</a>
+                        <div id="google_translate_element"></div>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-
-    <div id="google_translate_element" style="display:none;"></div>
 
     <section id="intro-cta" class="py-5 text-center bg-dark text-white">
         <div class="container">
@@ -115,17 +113,9 @@
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     <script type="text/javascript">
-        var googleTranslateElement;
         function googleTranslateElementInit() {
-            googleTranslateElement = new google.translate.TranslateElement({pageLanguage: 'zh-TW', autoDisplay: false}, 'google_translate_element');
+            new google.translate.TranslateElement({pageLanguage: 'zh-TW', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
         }
-
-        document.getElementById('google_translate_element_trigger').addEventListener('click', function(e) {
-            e.preventDefault();
-            if (googleTranslateElement) {
-                googleTranslateElement.translatePage('zh-TW', 'en');
-            }
-        });
     </script>
 
     <script>

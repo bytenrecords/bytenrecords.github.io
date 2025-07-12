@@ -1,1 +1,1 @@
-fix: improve Google Translate integration
+feat: style Google Translate dropdown
