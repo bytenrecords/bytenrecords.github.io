@@ -122,7 +122,7 @@
 
     <script type="text/javascript">
         function googleTranslateElementInit() {
-            new google.translate.TranslateElement({pageLanguage: 'zh-TW', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+            new google.translate.TranslateElement({pageLanguage: 'zh-Hant', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
         }
 
         // Hide Google Translate default UI
@@ -149,7 +149,6 @@
                     const lang = langMap[this.value];
                     if (lang) {
                         setCookie('googtrans', '/zh-TW/' + lang, 1);
-                        setCookie('googtrans', '/zh-TW/' + lang, 1, window.location.hostname);
                         location.reload();
                     }
                 });
