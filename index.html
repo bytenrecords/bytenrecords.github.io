@@ -115,44 +115,16 @@
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     <script type="text/javascript">
+        var googleTranslateElement;
         function googleTranslateElementInit() {
-            new google.translate.TranslateElement({pageLanguage: 'zh-TW', autoDisplay: false}, 'google_translate_element');
-        }
-
-        function doGTranslate(lang_pair) {
-            if(lang_pair.value)lang_pair=lang_pair.value;
-            if(lang_pair=='')return;
-            var lang=lang_pair.split('|')[1];
-            var teCombo;
-            var sel=document.getElementsByTagName('select');
-            for(var i=0;i<sel.length;i++){
-                if(sel[i].className=='goog-te-combo'){
-                    teCombo=sel[i];
-                    break;
-                }
-            }
-            if (document.getElementById('google_translate_element')==null||document.getElementById('google_translate_element').innerHTML.length==0||teCombo.length==0||teCombo.innerHTML.length==0) {
-                setTimeout(function(){doGTranslate(lang_pair)},500);
-            } else {
-                teCombo.value=lang;
-                GTranslateFireEvent(teCombo,'change');
-            }
-        }
-
-        function GTranslateFireEvent(element,event){
-            if(document.createEvent){
-                var evt=document.createEvent("HTMLEvents");
-                evt.initEvent(event,true,true);
-                element.dispatchEvent(evt);
-            }else{
-                var evt=document.createEventObject();
-                element.fireEvent('on'+event,evt);
-            }
+            googleTranslateElement = new google.translate.TranslateElement({pageLanguage: 'zh-TW', autoDisplay: false}, 'google_translate_element');
         }
 
         document.getElementById('google_translate_element_trigger').addEventListener('click', function(e) {
             e.preventDefault();
-            doGTranslate('zh-TW|en');
+            if (googleTranslateElement) {
+                googleTranslateElement.translatePage('zh-TW', 'en');
+            }
         });
     </script>
 

@@ -1,1 +1,1 @@
-feat: integrate stylish Google Translate
+fix: improve Google Translate integration
