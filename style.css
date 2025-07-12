@@ -91,15 +91,12 @@ footer a:hover {
     color: #adb5bd;
 }
 
-/* Hide Google Translate branding */
-.goog-te-banner-frame.skiptranslate, .goog-te-gadget-simple {
-    display: none !important;
-}
-body > .skiptranslate {
+/* Hide Google Translate banner */
+.goog-te-banner-frame.skiptranslate {
     display: none !important;
 }
 
-/* Style the Google Translate dropdown */
+/* Ensure the dropdown is visible and styled */
 #google_translate_element .goog-te-combo {
     background-color: #343a40; /* Dark background */
     color: #ffffff; /* White text */
@@ -110,6 +107,7 @@ body > .skiptranslate {
     line-height: 1.5;
     height: calc(1.5em + 0.75rem + 2px); /* Match Bootstrap form control height */
     vertical-align: middle;
+    display: inline-block; /* Ensure it's not hidden */
 }
 
 #google_translate_element .goog-te-combo:focus {
