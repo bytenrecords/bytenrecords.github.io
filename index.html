@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,21 +38,13 @@
                         <a class="nav-link" href="#blog">博客</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#songwriting-request">作曲填詞需求</a>
+                        <a class="nav-link" href="#collaborations">尋求合作</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#members">成員</a>
                     </li>
                     <li class="nav-item">
-                        <div class="nav-link p-0">
-    <select id="custom-lang-select" class="form-select form-select-sm" style="width:auto; display:inline-block;">
-        <option value="zh-TW">中文</option>
-        <option value="en">EN</option>
-        <option value="ja">日本語</option>
-        <option value="ko">한국어</option>
-    </select>
-    <div id="google_translate_element" style="display:none;"></div>
-</div>
+                        <div id="google_translate_element"></div>
                     </li>
                 </ul>
             </div>
@@ -67,7 +59,7 @@
                     <p class="lead mb-4">
                         我們是一個獨立音樂廠牌與工作室，集結了各路的獨立音樂人，一起創作優質音樂。
                     </p>
-                    <a href="#songwriting-request" class="btn btn-lg btn-light mt-4">馬上開始玩音樂</a>
+                    <a href="#members" class="btn btn-lg btn-light mt-4">在 Spotify 上關注</a>
                 </div>
             </div>
         </div>
@@ -80,11 +72,11 @@
         </div>
     </section>
 
-    <section id="songwriting-request" class="py-5 bg-dark text-white">
+    <section id="collaborations" class="py-5 bg-dark text-white">
         <div class="container">
-            <h2 class="text-center mb-5 display-5 fw-bold">作曲填詞需求</h2>
+            <h2 class="text-center mb-5 display-5 fw-bold">尋求合作</h2>
             <p class="text-center lead">
-                如有作曲填詞需求，請聯絡：
+                如果您有興趣合作，請聯絡：
             </p>
             <p class="text-center lead fw-bold">
                 <a href="mailto:bytenrecords+info@gmail.com" class="text-white">bytenrecords+info@gmail.com</a> (Emma W.)
@@ -119,44 +111,8 @@
 
     <script type="text/javascript">
         function googleTranslateElementInit() {
-            new google.translate.TranslateElement({pageLanguage: 'zh-Hant', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+          new google.translate.TranslateElement({pageLanguage: 'zh-TW'}, 'google_translate_element');
         }
-
-        // Hide Google Translate default UI
-        document.addEventListener('DOMContentLoaded', function() {
-            // Custom language selector logic
-            const langMap = {
-                'zh-TW': 'zh-TW',
-                'en': 'en',
-                'ja': 'ja',
-                'ko': 'ko'
-            };
-            function setCookie(name, value, days) {
-                let expires = "";
-                if (days) {
-                    const date = new Date();
-                    date.setTime(date.getTime() + (days*24*60*60*1000));
-                    expires = "; expires=" + date.toUTCString();
-                }
-                document.cookie = name + "=" + (value || "")  + expires + "; path=/";
-            }
-            const select = document.getElementById('custom-lang-select');
-            if (select) {
-                select.addEventListener('change', function() {
-                    const lang = langMap[this.value];
-                    if (lang) {
-                        setCookie('googtrans', '/zh-TW/' + lang, 1);
-                        location.reload();
-                    }
-                });
-            }
-            // On page load, set selector to current language
-            const match = document.cookie.match(/googtrans=\/zh-TW\/([a-zA-Z\-]+)/);
-            if (match && select) {
-                const currentLang = match[1];
-                select.value = currentLang;
-            }
-        });
     </script>
 
     <script>
@@ -177,18 +133,4 @@
         });
     </script>
 </body>
-<style>
-/* Hide Google Translate default UI */
-.goog-te-banner-frame.skiptranslate,
-.goog-te-gadget-icon,
-.goog-te-menu-value,
-.goog-te-balloon-frame,
-.goog-te-menu-frame,
-.goog-te-gadget-simple {
-    display: none !important;
-}
-body {
-    top: 0px !important;
-}
-</style>
 </html>
