@@ -106,6 +106,12 @@ footer a:hover {
     padding: .375rem .75rem;
     font-size: 1rem;
     line-height: 1.5;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+#google_translate_element .goog-te-combo:hover {
+    background-color: #495057;
+    border-color: #6c757d;
 }
 
 #google_translate_element .goog-te-combo:focus {
@@ -116,6 +122,27 @@ footer a:hover {
 
 #google_translate_element {
     margin-left: 1rem;
+    position: relative;
+}
+
+/* Styling the dropdown options */
+.goog-te-menu-frame {
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    border: 1px solid #495057 !important;
+    background-color: #343a40 !important;
+}
+
+.goog-te-menu2-item, .goog-te-menu2-item-selected {
+    color: #ffffff !important;
+    background-color: #343a40 !important;
+    padding: 10px 15px !important;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.goog-te-menu2-item:hover {
+    background-color: #495057 !important;
+    color: #f8f9fa !important;
 }
 
 /* --- Responsive Adjustments --- */
