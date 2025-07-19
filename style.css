@@ -97,6 +97,24 @@ footer a:hover {
     display: none !important;
 }
 
+body {
+    top: 40px !important;
+}
+
+.goog-te-gadget-simple {
+    background-color: #343a40 !important;
+    border-left: 1px solid #495057 !important;
+    border-right: 1px solid #495057 !important;
+    border-bottom: 1px solid #495057 !important;
+    border-radius: 0 0 8px 8px !important;
+    padding: 8px !important;
+    display: inline-block;
+}
+
+.goog-te-gadget-simple span {
+    color: #ffffff !important;
+}
+
 /* Style the Google Translate dropdown to match the dark theme */
 #google_translate_element .goog-te-combo {
     background-color: #343a40;
