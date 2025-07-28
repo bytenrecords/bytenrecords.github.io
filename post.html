@@ -85,8 +85,6 @@
                         document.title = postFile.replace('.md', '');
                     } else if (postFile.endsWith('.html')) {
                         postContent.innerHTML = text;
-                        const newTitle = new DOMParser().parseFromString(text, "text/html").querySelector('title').textContent;
-                        document.title = newTitle || postFile.replace('.html', '');
                     }
                 })
                 .catch(error => {

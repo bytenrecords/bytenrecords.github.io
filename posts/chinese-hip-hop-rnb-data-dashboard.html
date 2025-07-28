@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>華語嘻哈與R&B市場洞察儀表板</title>
+    <title>華語嘻哈R&B數據儀表板</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Warm Neutral Harmony -->
     <!-- Application Structure Plan: A multi-section, dashboard-style SPA. The structure prioritizes user-driven exploration over the linear format of the source report. It starts with high-level insights, then allows users to dive into an interactive dashboard with filters for region and year. A core feature is the 'Artist Deep Dive' section, which dynamically displays detailed data and individual performance charts upon user selection from the main chart or table. This non-linear, interactive approach is chosen to empower users to easily compare artists, identify trends, and access detailed information on demand, making the dense data more engaging and understandable. -->
-    <!-- Visualization & Content Choices:
+    <!-- Visualization & Content Choices: 
         - Key Findings (Inform): Presented as static, prominent cards using HTML/CSS for a quick summary of the report's main conclusions.
         - Artist Comparison (Compare/Explore): An interactive horizontal bar chart (Chart.js) shows total song output, allowing easy comparison across many artists. Filters for region/year update this chart. A sortable HTML table provides detailed data. This combination offers both visual and tabular comparison.
         - Artist Trends (Change): A dynamic line chart (Chart.js) appears in the 'Artist Deep Dive' section to show individual artist's year-over-year performance, triggered by user interaction. This isolates trends for focused analysis.
@@ -292,7 +292,7 @@
                 filteredData.sort((a, b) => {
                     let valA = a[currentSort.key];
                     let valB = b[currentSort.key];
-
+                    
                     if (typeof valA === 'string') {
                         return currentSort.direction === 'asc' ? valA.localeCompare(valB, 'zh-Hant') : valB.localeCompare(valA, 'zh-Hant');
                     } else {
@@ -431,10 +431,10 @@
                         }
                     }
                 });
-
+                
                 artistDetailSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-
+            
             navButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const targetId = button.dataset.target;
