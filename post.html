@@ -80,8 +80,14 @@
                     return response.text();
                 })
                 .then(text => {
-                    postContent.innerHTML = md.render(text);
-                    document.title = postFile.replace('.md', '');
+                    if (postFile.endsWith('.md')) {
+                        postContent.innerHTML = md.render(text);
+                        document.title = postFile.replace('.md', '');
+                    } else if (postFile.endsWith('.html')) {
+                        postContent.innerHTML = text;
+                        const newTitle = new DOMParser().parseFromString(text, "text/html").querySelector('title').textContent;
+                        document.title = newTitle || postFile.replace('.html', '');
+                    }
                 })
                 .catch(error => {
                     postContent.innerHTML = `<p class="text-center text-danger">${error.message}</p>`;
