@@ -3,29 +3,46 @@ body {
     font-family: 'Montserrat', sans-serif;
     padding-top: 56px;
     scroll-behavior: smooth;
-    background-color: #f8f9fa;
+    background-image: url('background.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: #f8f9fa; /* Light text color for readability */
     top: 0px !important;
 }
 
-/* Change: Removed #logo-display section styles */
-/*
-#logo-display { ... }
-*/
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+    z-index: -1;
+}
+
+section {
+    background-color: rgba(17, 17, 17, 0.8); /* Semi-transparent dark background for sections */
+    margin-bottom: 20px;
+    border-radius: 15px;
+    padding: 40px;
+}
 
 /* --- Intro CTA Section Styling --- */
 #intro-cta {
-    /* Added top border since logo section is gone */
-    border-top: 1px solid #343a40;
+    border-top: none; /* remove border */
+    background-color: transparent;
 }
 
 #intro-cta .lead {
-    font-size: 1.25rem;
+    font-size: 1.1rem; /* Reduced from 1.25rem */
     font-weight: 400;
 }
 
 .short-description {
     color: #adb5bd;
-    font-size: 1.1rem;
+    font-size: 1rem; /* Reduced from 1.1rem */
 }
 
 
@@ -49,6 +66,7 @@ body {
 /* --- General & Navbar Adjustments --- */
 .navbar {
     transition: background-color 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.5) !important; /* Make navbar semi-transparent */
 }
 
 .nav-link {
@@ -64,29 +82,28 @@ body {
 
 /* --- Footer Styling --- */
 footer {
-    /* Background color set via bg-dark */
     border-top: 1px solid #343a40;
-    /* Padding updated via Bootstrap classes pt-5 pb-4 */
+    background-color: rgba(17, 17, 17, 0.8); /* Semi-transparent dark background for footer */
+    border-radius: 15px;
+    color: #f8f9fa;
 }
 
-/* Change: Styles for the main logo now in the footer */
 .main-logo {
-    max-width: 180px; /* Adjusted size for footer context */
+    max-width: 150px; /* Reduced from 180px */
     height: auto;
-    /* Change: Added rounded corners */
-    border-radius: 15px; /* Adjust pixel value as needed */
-    /* Margin added via Bootstrap class mb-4 */
+    border-radius: 15px;
 }
 
 
 footer p {
     margin-bottom: 0.25rem;
-    font-size: 0.9rem;
+    font-size: 0.8rem; /* Reduced from 0.9rem */
 }
 
 footer a {
     text-decoration: none;
     transition: color 0.2s ease;
+    color: #f8f9fa;
 }
 footer a:hover {
     color: #adb5bd;
@@ -118,17 +135,70 @@ footer a:hover {
     margin-left: 1rem;
 }
 
+/* Adjusting heading sizes */
+h2.display-5 {
+    font-size: 2.2rem;
+}
+
+h1.display-4 {
+    font-size: 2.8rem;
+}
+
+
 /* --- Responsive Adjustments --- */
 @media (max-width: 767.98px) {
     /* Adjust logo size in footer for mobile if needed */
     .main-logo {
-        max-width: 150px;
+        max-width: 120px; /* Reduced from 150px */
     }
     .display-5 {
-        font-size: 2rem;
+        font-size: 1.8rem; /* Reduced */
     }
     .artist-description {
          text-align: center;
          margin-top: 2rem;
     }
+}
+
+@media (max-width: 575.98px) {
+    .display-4 {
+        font-size: 2rem; /* Reduced */
+    }
+    .display-5 {
+        font-size: 1.5rem; /* Reduced */
+    }
+    .lead {
+        font-size: 1rem; /* Reduced */
+    }
+}
+
+/* Make links white */
+a {
+    color: #fff;
+}
+
+a:hover {
+    color: #eee;
+}
+
+.list-group-item {
+    background-color: transparent;
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.list-group-item a {
+    color: #fff;
+}
+
+#blog, #collaborations, #members {
+    background-color: transparent;
+}
+
+.list-group-item.list-group-item-action:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+#collaborations a {
+    font-weight: bold;
 }
