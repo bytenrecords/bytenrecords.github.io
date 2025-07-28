@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>華語嘻哈與R&B市場洞察儀表板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutral Harmony -->
+    <!-- Application Structure Plan: A multi-section, dashboard-style SPA. The structure prioritizes user-driven exploration over the linear format of the source report. It starts with high-level insights, then allows users to dive into an interactive dashboard with filters for region and year. A core feature is the 'Artist Deep Dive' section, which dynamically displays detailed data and individual performance charts upon user selection from the main chart or table. This non-linear, interactive approach is chosen to empower users to easily compare artists, identify trends, and access detailed information on demand, making the dense data more engaging and understandable. -->
+    <!-- Visualization & Content Choices:
+        - Key Findings (Inform): Presented as static, prominent cards using HTML/CSS for a quick summary of the report's main conclusions.
+        - Artist Comparison (Compare/Explore): An interactive horizontal bar chart (Chart.js) shows total song output, allowing easy comparison across many artists. Filters for region/year update this chart. A sortable HTML table provides detailed data. This combination offers both visual and tabular comparison.
+        - Artist Trends (Change): A dynamic line chart (Chart.js) appears in the 'Artist Deep Dive' section to show individual artist's year-over-year performance, triggered by user interaction. This isolates trends for focused analysis.
+        - Market Analysis (Organize/Inform): Qualitative insights are presented in structured, readable text blocks using Tailwind CSS for clear layout, making the narrative part of the report digestible.
+        - Justification: This structure breaks down the report into thematic, interactive components. Chart.js on Canvas is used for all visualizations, ensuring compliance and good performance. The interactions (filtering, sorting, drill-down) are designed to facilitate a journey from a broad market overview to specific artist details, enhancing usability. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #FDFBF8;
+            color: #38332E;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            max-height: 800px;
+            padding: 1rem;
+            background-color: #FFFFFF;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .artist-detail-chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 1rem auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-button.active {
+            border-bottom-color: #A88767;
+            color: #A88767;
+            font-weight: 700;
+        }
+        .nav-button:hover {
+            color: #A88767;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FDFBF8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C6B8;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A88767;
+        }
+        .table-container {
+            max-height: 800px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="app" class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#6B5B4B] mb-2">華語嘻哈與R&B市場洞察</h1>
+            <p class="text-lg text-[#A88767]">2022-2025 藝人音樂產出互動式分析報告</p>
+        </header>
+
+        <nav class="flex justify-center border-b border-gray-200 mb-8">
+            <button data-target="dashboard" class="nav-button active px-4 py-2 text-lg">互動儀表板</button>
+            <button data-target="analysis" class="nav-button px-4 py-2 text-lg">市場趨勢分析</button>
+        </nav>
+
+        <main>
+            <section id="dashboard" class="content-section">
+                <div class="mb-8 p-6 bg-white rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-[#6B5B4B]">核心發現摘要</h2>
+                    <p class="mb-6 text-gray-600">本節提煉了報告中的關鍵洞察。透過下方的儀表板，您可以互動式地探索數據，驗證這些發現，並從中獲得您自己的見解。您可以透過篩選地區、搜尋藝人或點擊圖表來深入分析。</p>
+                    <div class="grid md:grid-cols-3 gap-4 text-center">
+                        <div class="p-4 bg-[#F8F5F1] rounded-lg">
+                            <h3 class="font-bold text-lg text-[#A88767]">產出量級差異</h3>
+                            <p class="text-sm text-gray-700">不同藝人間的音樂產出量存在巨大鴻溝，部分中國大陸藝人展現出更高的發行活躍度。</p>
+                        </div>
+                        <div class="p-4 bg-[#F8F5F1] rounded-lg">
+                            <h3 class="font-bold text-lg text-[#A88767]">發行策略轉變</h3>
+                            <p class="text-sm text-gray-700">以更高兄弟為例，團體發行趨緩，成員個人作品活躍，反映了市場策略從團體轉向個人發展。</p>
+                        </div>
+                        <div class="p-4 bg-[#F8F5F1] rounded-lg">
+                            <h3 class="font-bold text-lg text-[#A88767]">數據完整性挑戰</h3>
+                            <p class="text-sm text-gray-700">部分藝人數據來源較為稀疏，其年度產量可能被低估，凸顯了標準化數據庫的重要性。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm mb-8">
+                    <h2 class="text-2xl font-bold mb-4 text-[#6B5B4B]">藝人產出比較儀表板</h2>
+                    <div class="grid md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label for="region-filter" class="block text-sm font-medium text-gray-700">地區篩選</label>
+                            <select id="region-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#A88767] focus:border-[#A88767] sm:text-sm rounded-md">
+                                <option value="all">所有地區</option>
+                                <option value="台灣">台灣</option>
+                                <option value="中國大陸">中國大陸</option>
+                                <option value="香港">香港</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="year-filter" class="block text-sm font-medium text-gray-700">數據年份 (總量)</label>
+                            <select id="year-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#A88767] focus:border-[#A88767] sm:text-sm rounded-md">
+                                <option value="all">2022-2025 總計</option>
+                                <option value="2022">2022年</option>
+                                <option value="2023">2023年</option>
+                                <option value="2024">2024年</option>
+                                <option value="2025">2025年</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="artist-search" class="block text-sm font-medium text-gray-700">搜尋藝人</label>
+                            <input type="text" id="artist-search" placeholder="輸入歌手/團體名稱..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#A88767] focus:border-[#A88767] sm:text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-5 gap-8">
+                    <div class="lg:col-span-3">
+                        <div class="chart-container">
+                            <canvas id="main-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <div class="bg-white p-4 rounded-xl shadow-sm">
+                            <h3 class="text-xl font-bold mb-3 text-[#6B5B4B]">數據列表</h3>
+                            <div class="table-container">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="artist">歌手/團體</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="region">地區</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="total">總發行數</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="artist-table-body" class="bg-white divide-y divide-gray-200">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="artist-detail-section" class="mt-8 p-6 bg-white rounded-xl shadow-sm hidden">
+                    <h2 id="artist-detail-name" class="text-3xl font-bold text-[#6B5B4B] mb-2"></h2>
+                    <div class="flex items-center space-x-4 mb-4 text-gray-600">
+                        <span id="artist-detail-region" class="bg-[#F8F5F1] px-3 py-1 rounded-full text-sm"></span>
+                        <span id="artist-detail-genre" class="text-sm"></span>
+                    </div>
+                    <div class="artist-detail-chart-container">
+                        <canvas id="artist-detail-chart"></canvas>
+                    </div>
+                    <div class="mt-4 prose max-w-none prose-p:text-gray-700 prose-strong:text-[#6B5B4B]">
+                        <h4 class="font-bold text-lg">數據來源與驗證說明</h4>
+                        <p id="artist-detail-notes"></p>
+                    </div>
+                </div>
+
+            </section>
+
+            <section id="analysis" class="content-section hidden">
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <h2 class="text-3xl font-bold mb-6 text-center text-[#6B5B4B]">市場趨勢深度分析</h2>
+                    <div class="space-y-8">
+                        <div>
+                            <h3 class="text-2xl font-semibold mb-3 text-[#A88767]">發行節奏與合作策略</h3>
+                            <p class="text-gray-700 leading-relaxed">數據清晰地展示了不同市場環境下藝人發行策略的差異。以GAI、Lil Ghost為代表的中國大陸藝人，其高產量部分源於與主流媒體（綜藝、影視）的深度捆綁，這使得他們能夠維持持續的市場曝光度。相比之下，台灣藝人如9m88、Marz23則更傾向於以專輯為單位進行系統性的作品發布，這種模式有助於塑造更為完整的藝術形象和音樂敘事。</p>
+                            <p class="mt-4 text-gray-700 leading-relaxed">此外，數據也凸顯了合作（Collaboration）在特定音樂社群中的重要作用。在台灣的R&B與嘻哈音樂圈中，一個緊密的合作網絡清晰可見。這不僅是商業合作，更反映了一個健康活躍的音樂生態系統，藝人們透過相互合作來交叉推廣，擴大聽眾基礎。這個合作網絡本身就是一張影響力地圖，為品牌方提供了高效的市場滲透策略。</p>
+                        </div>
+                        <div class="border-t border-gray-200 pt-8">
+                            <h3 class="text-2xl font-semibold mb-3 text-[#A88767]">區域市場動態比較</h3>
+                            <p class="text-gray-700 leading-relaxed">從數據總量來看，本次抽樣的中國大陸藝人展現了最高的平均發行量。這一現象與中國大陸龐大的數位音樂市場規模、激烈的競爭環境以及綜藝節目對音樂產業的強大驅動力密切相關。電視節目不僅是新歌的發布平台，其本身也成為了音樂內容的生產源頭。</p>
+                            <p class="mt-4 text-gray-700 leading-relaxed">台灣市場的藝人則表現出更為多元的發展路徑，既有商業上成功的旋律說唱歌手，也有在特定風格領域深耕並獲專業認可的藝人。香港的代表Gareth.T則以其國際化風格，在粵語市場中獨樹一幟，其穩定的單曲發行節奏顯示出清晰的市場佈局。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-12 text-sm text-gray-500">
+            <p>數據來源：華語嘻哈與R&B市場藝人音樂產出分析報告 (2022-2025)。</p>
+            <p>本應用程式僅為數據視覺化展示，數據準確性與完整性以原始報告為準。</p>
+        </footer>
+    </div>
+
+    <script>
+        const artistData = [
+            { rank: 1, artist: "OSN (高爾宣)", region: "台灣", genre: "療癒系旋律饒舌", releases: { 2022: 4, 2023: 0, 2024: 3, 2025: 3 }, notes: "2022年：發行專輯《#OSNRAPII-JOURNEY》，計入4首明確標示的單曲。2023年：無發行記錄。2024年：發行3首單曲，包含加速版與現場版。2025年：發行3首單曲，包含Remix與加速版。" },
+            { rank: 2, artist: "J.Sheon", region: "台灣", genre: "R&B / 旋律饒舌", releases: { 2022: 2, 2023: 3, 2024: 12, 2025: 3 }, notes: "2022年：發行2首單曲。2023年：發行2首個人單曲及1首合作曲。2024年：發行11首曲目的專輯《OUTCOMES 結果論》及1首合作單曲。2025年：參與3首合作單曲。" },
+            { rank: 3, artist: "Soft Lipa (蛋堡)", region: "台灣", genre: "爵士嘻哈", releases: { 2022: 14, 2023: 1, 2024: 0, 2025: 0 }, notes: "2022年：發行12首曲目的器樂專輯《LOOPS for LIFE VOL. 1》及2首合作曲。2023年：參與1首合作曲。2024-2025年：無發行記錄。" },
+            { rank: 4, artist: "Karencici (林愷倫)", region: "台灣", genre: "R&B / Hip-Hop", releases: { 2022: 2, 2023: 7, 2024: 18, 2025: 2 }, notes: "數據來源詳盡。2022年：2首合作。2023年：3首個人單曲及4首合作。2024年：發行11首曲目的專輯《Made For You》，並有5首獨立單曲及2首合作。2025年：1首個人單曲及1首合作。" },
+            { rank: 5, artist: "Gareth.T (湯令山)", region: "香港", genre: "R&B / 靈魂樂 / 流行", releases: { 2022: 4, 2023: 5, 2024: 7, 2025: 3 }, notes: "數據基於明確標示發行日期的單曲。2022年：專輯《to be honest》曲目數未知，計入4首單曲。2023年：5首單曲。2024年：7首單曲。2025年：3首單曲。" },
+            { rank: 6, artist: "LBI (利比)", region: "中國大陸", genre: "國語流行 / Hip-Hop / 旋律R&B", releases: { 2022: 2, 2023: 2, 2024: 1, 2025: 9 }, notes: "數據來源多為專輯列表，缺乏具體年份，年度產量可能不精確。此處數據基於可查證年份的單曲。" },
+            { rank: 7, artist: "Vava (毛衍七)", region: "中國大陸", genre: "強勢風格饒舌", releases: { 2022: 0, 2023: 11, 2024: 0, 2025: 2 }, notes: "2022年與2024年：無發行記錄。2023年：發行11首單曲或合作曲。2025年：發行2首單曲。" },
+            { rank: 8, artist: "Lexie Liu (劉柏辛)", region: "中國大陸", genre: "電音饒舌 / 國際化Hip-Hop", releases: { 2022: 2, 2023: 2, 2024: 1, 2025: 3 }, notes: "2022年：專輯《The Happy Star》中的2首主打單曲。2023年：1首個人單曲及1首合作曲。2024年：1首合作曲。2025年：2首單曲及1首宣傳單曲。" },
+            { rank: 9, artist: "GAI (周延)", region: "中國大陸", genre: "中華風Trap", releases: { 2022: 14, 2023: 2, 2024: 5, 2025: 10 }, notes: "高產藝人，發行與綜藝、影視深度捆綁。2022年：13首曲目的專輯《杜康》及1首現場單曲。2024年：專輯《底层逻辑》因缺乏曲目數未計入。2025年：數據來自Mixtape及多首單曲。" },
+            { rank: 10, artist: "Higher Brothers (更高兄弟)", region: "中國大陸", genre: "國際化Trap / 成都饒舌", releases: { 2022: 48, 2023: 4, 2024: 0, 2025: 0 }, notes: "註記：團體無發行，數據為核心成員個人作品總和。2022年：馬思唯發行兩張專輯(共32首)，KnowKnow發行一張專輯(16首)。2023年：馬思唯發行4首曲目的EP。" },
+            { rank: 11, artist: "Wang Yitai (王以太)", region: "中國大陸", genre: "流行饒舌", releases: { 2022: 1, 2023: 2, 2024: 14, 2025: 7 }, notes: "2024年產量爆發，發行了包含14首曲目的個人專輯《Love Me Later》。" },
+            { rank: 12, artist: "Tizzy T", region: "中國大陸", genre: "情歌旋律饒舌", releases: { 2022: 2, 2023: 5, 2024: 3, 2025: 4 }, notes: "產出穩定，包含EP、單曲及宣傳曲。" },
+            { rank: 13, artist: "Jony J", region: "中國大陸", genre: "敘事風饒舌", releases: { 2022: 1, 2023: 11, 2024: 1, 2025: 1 }, notes: "發行模式以專輯為核心，2023年發行了11首曲目的專輯《24时》。" },
+            { rank: 14, artist: "Vinida (萬妮達)", region: "中國大陸", genre: "女王風饒舌", releases: { 2022: 7, 2023: 2, 2024: 9, 2025: 6 }, notes: "產出活躍，包含專輯、單曲及音樂影片。" },
+            { rank: 15, artist: "Ice Paper (鬼卞)", region: "中國大陸", genre: "詩意饒舌 / 混合曲風", releases: { 2022: 1, 2023: 0, 2024: 7, 2025: 1 }, notes: "2022年專輯《水之幻想》因缺乏曲目數，計為1次發行，可能低估。" },
+            { rank: 16, artist: "NINEONE", region: "中國大陸", genre: "流行 / Trap", releases: { 2022: 2, 2023: 5, 2024: 5, 2025: 1 }, notes: "發行形式多樣，包括單曲、音樂影片、EP及現場版。" },
+            { rank: 17, artist: "PO8", region: "中國大陸", genre: "爵士饒舌 / Old-school", releases: { 2022: 1, 2023: 14, 2024: 5, 2025: 5 }, notes: "2023年發行了12首曲目的專輯《熱島》及2首額外單曲。" },
+            { rank: 18, artist: "Lil Ghost (小鬼)", region: "中國大陸", genre: "流行龐克 / Trap", releases: { 2022: 16, 2023: 1, 2024: 6, 2025: 15 }, notes: "產出量極高，2022年發行16首曲目的專輯《DEADLINE》，2025年發行大量單曲及現場版。" },
+            { rank: 19, artist: "ØZI", region: "台灣", genre: "R&B / 電子 / Hip-Hop", releases: { 2022: 2, 2023: 2, 2024: 8, 2025: 11 }, notes: "合作網絡核心人物，2025年發行9首曲目的專輯《SWIRL》及2首單曲。" },
+            { rank: 20, artist: "9m88", region: "台灣", genre: "靈魂樂 / R&B / 爵士", releases: { 2022: 11, 2023: 8, 2024: 1, 2025: 2 }, notes: "典型的專輯導向發行模式，2022年發行專輯《9m88 Radio》(11首)，2023年發行專輯《Sent》(8首)。" },
+            { rank: 21, artist: "Marz23", region: "台灣", genre: "流行饒舌 / R&B", releases: { 2022: 0, 2023: 12, 2024: 2, 2025: 2 }, notes: "2023年發行了12首曲目的專輯《不遠處》。" },
+            { rank: 22, artist: "Howard Lee (李浩瑋)", region: "台灣", genre: "柔性旋律饒舌", releases: { 2022: 1, 2023: 7, 2024: 1, 2025: 0 }, notes: "2023年發行多首單曲，包含專輯同名曲及影視、活動主題曲。" },
+            { rank: 23, artist: "王ADEN", region: "台灣", genre: "國語流行R&B", releases: { 2022: 3, 2023: 11, 2024: 1, 2025: 0 }, notes: "2023年發行10首曲目的專輯《Be a Lover》及1首額外單曲。" },
+            { rank: 24, artist: "WML", region: "中國大陸", genre: "旋律R&B / 饒舌", releases: { 2022: 0, 2023: 1, 2024: 8, 2025: 5 }, notes: "2024年起發行頻率顯著提高，多為單曲及電影主題曲。" },
+            { rank: 25, artist: "SKAI ISYOURGOD (揽佬)", region: "中國大陸", genre: "新式饒舌 / Trap", releases: { 2022: 1, 2023: 2, 2024: 7, 2025: 6 }, notes: "專輯曲目數部分可識別，數據基於可識別曲目及單曲。" },
+            { rank: 26, artist: "Trout Fresh (鱒魚)", region: "台灣", genre: "新潮饒舌 / R&B", releases: { 2022: 0, 2023: 0, 2024: 1, 2025: 0 }, notes: "數據顯著低估。2024年發行專輯《好聲豪氣》，因缺乏曲目數，僅計為1次發行。" },
+            { rank: 27, artist: "Julia Wu (吳卓源)", region: "台灣", genre: "R&B / Hip-Hop", releases: { 2022: 9, 2023: 0, 2024: 8, 2025: 3 }, notes: "2022年發行8首曲目的專輯《Idfk》及1首合作曲。2024年發行專輯《brb》及多首單曲。" },
+            { rank: 28, artist: "Dwagie (大支)", region: "台灣", genre: "議題性饒舌 / 中臺融合", releases: { 2022: 1, 2023: 2, 2024: 2, 2025: 4 }, notes: "2023年專輯《愛》因缺乏曲目數計為1次發行，數據可能低估。" },
+            { rank: 29, artist: "B.C.W. Barry", region: "台灣", genre: "創新型Hip-Hop / R&B", releases: { 2022: 5, 2023: 8, 2024: 1, 2025: 2 }, notes: "註記：目標藝人為台灣饒舌歌手 Barry Chen。2023年發行專輯《Rose Again》(7首)及1首單曲。" },
+            { rank: 30, artist: "Kumachan", region: "台灣", genre: "實驗性Hip-Hop", releases: { 2022: 14, 2023: 4, 2024: 1, 2025: 1 }, notes: "2022年發行14首曲目的專輯《PRO》。" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainChartCanvas = document.getElementById('main-chart');
+            const artistDetailChartCanvas = document.getElementById('artist-detail-chart');
+            const regionFilter = document.getElementById('region-filter');
+            const yearFilter = document.getElementById('year-filter');
+            const artistSearch = document.getElementById('artist-search');
+            const tableBody = document.getElementById('artist-table-body');
+            const artistDetailSection = document.getElementById('artist-detail-section');
+            const navButtons = document.querySelectorAll('.nav-button');
+            const contentSections = document.querySelectorAll('.content-section');
+            const tableHeaders = document.querySelectorAll('th[data-sort]');
+
+            let mainChart;
+            let artistDetailChart;
+            let currentSort = { key: 'total', direction: 'desc' };
+
+            const chartColors = {
+                '台灣': 'rgba(100, 150, 190, 0.7)',
+                '中國大陸': 'rgba(190, 100, 100, 0.7)',
+                '香港': 'rgba(100, 190, 150, 0.7)',
+                'default': 'rgba(168, 135, 103, 0.7)'
+            };
+            const chartBorderColors = {
+                '台灣': 'rgba(100, 150, 190, 1)',
+                '中國大陸': 'rgba(190, 100, 100, 1)',
+                '香港': 'rgba(100, 190, 150, 1)',
+                'default': 'rgba(168, 135, 103, 1)'
+            };
+
+            function calculateTotal(artist, year = 'all') {
+                if (year === 'all') {
+                    return Object.values(artist.releases).reduce((a, b) => a + b, 0);
+                }
+                return artist.releases[year] || 0;
+            }
+
+            function update() {
+                const selectedRegion = regionFilter.value;
+                const selectedYear = yearFilter.value;
+                const searchTerm = artistSearch.value.toLowerCase();
+
+                let filteredData = artistData.filter(artist => {
+                    const regionMatch = selectedRegion === 'all' || artist.region === selectedRegion;
+                    const searchMatch = artist.artist.toLowerCase().includes(searchTerm);
+                    return regionMatch && searchMatch;
+                });
+
+                filteredData.forEach(d => d.total = calculateTotal(d, selectedYear));
+
+                filteredData.sort((a, b) => {
+                    let valA = a[currentSort.key];
+                    let valB = b[currentSort.key];
+
+                    if (typeof valA === 'string') {
+                        return currentSort.direction === 'asc' ? valA.localeCompare(valB, 'zh-Hant') : valB.localeCompare(valA, 'zh-Hant');
+                    } else {
+                        return currentSort.direction === 'asc' ? valA - valB : valB - valA;
+                    }
+                });
+
+                renderMainChart(filteredData);
+                renderTable(filteredData);
+                artistDetailSection.classList.add('hidden');
+            }
+
+            function renderMainChart(data) {
+                const chartData = {
+                    labels: data.map(d => d.artist),
+                    datasets: [{
+                        label: `歌曲發行數 (${yearFilter.options[yearFilter.selectedIndex].text})`,
+                        data: data.map(d => d.total),
+                        backgroundColor: data.map(d => chartColors[d.region] || chartColors.default),
+                        borderColor: data.map(d => chartBorderColors[d.region] || chartBorderColors.default),
+                        borderWidth: 1,
+                        hoverBackgroundColor: data.map(d => chartBorderColors[d.region] || chartBorderColors.default)
+                    }]
+                };
+
+                if (mainChart) {
+                    mainChart.destroy();
+                }
+                mainChart = new Chart(mainChartCanvas, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#F0EBE5'
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: (tooltipItems) => {
+                                        const index = tooltipItems[0].dataIndex;
+                                        return data[index].artist;
+                                    },
+                                    label: (tooltipItem) => {
+                                        const index = tooltipItem.dataIndex;
+                                        const artist = data[index];
+                                        return `地區: ${artist.region} | 發行數: ${artist.total}`;
+                                    }
+                                }
+                            }
+                        },
+                        onClick: (event, elements) => {
+                            if (elements.length > 0) {
+                                const chartElement = elements[0];
+                                const artist = data[chartElement.index];
+                                showArtistDetail(artist);
+                            }
+                        }
+                    }
+                });
+            }
+
+            function renderTable(data) {
+                tableBody.innerHTML = '';
+                data.forEach(artist => {
+                    const row = document.createElement('tr');
+                    row.className = 'cursor-pointer hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${artist.artist}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${artist.region}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 font-bold">${artist.total}</td>
+                    `;
+                    row.addEventListener('click', () => showArtistDetail(artist));
+                    tableBody.appendChild(row);
+                });
+            }
+
+            function showArtistDetail(artist) {
+                artistDetailSection.classList.remove('hidden');
+                document.getElementById('artist-detail-name').textContent = artist.artist;
+                document.getElementById('artist-detail-region').textContent = artist.region;
+                document.getElementById('artist-detail-genre').textContent = artist.genre;
+                document.getElementById('artist-detail-notes').textContent = artist.notes;
+
+                const chartData = {
+                    labels: ['2022', '2023', '2024', '2025'],
+                    datasets: [{
+                        label: '年度發行數',
+                        data: Object.values(artist.releases),
+                        fill: false,
+                        borderColor: chartBorderColors[artist.region] || chartBorderColors.default,
+                        backgroundColor: chartColors[artist.region] || chartColors.default,
+                        tension: 0.1,
+                        pointRadius: 5,
+                        pointHoverRadius: 8
+                    }]
+                };
+
+                if (artistDetailChart) {
+                    artistDetailChart.destroy();
+                }
+                artistDetailChart = new Chart(artistDetailChartCanvas, {
+                    type: 'line',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
+                artistDetailSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    contentSections.forEach(section => {
+                        if (section.id === targetId) {
+                            section.classList.remove('hidden');
+                        } else {
+                            section.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            tableHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const key = header.dataset.sort;
+                    if (currentSort.key === key) {
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.key = key;
+                        currentSort.direction = 'desc';
+                    }
+                    update();
+                });
+            });
+
+            regionFilter.addEventListener('change', update);
+            yearFilter.addEventListener('change', update);
+            artistSearch.addEventListener('input', update);
+
+            update();
+        });
+    </script>
+</body>
+</html>
