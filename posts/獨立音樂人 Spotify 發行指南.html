@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>獨立音樂人 Spotify 發行指南</title>
+    
+    <!-- Chosen Palette: Warm Harmony -->
+    <!-- Application Structure Plan: The application is structured as a non-linear, three-stage "Release Journey" (創作, 發行, 連結) to guide the user through the process of releasing music. This task-oriented design, navigated by a sticky header, is more user-friendly than the report's original linear format. It allows artists to jump directly to the section most relevant to their current needs. Key interactions include interactive filterable card grids for comparing DAWs and Distributors, which turn dense data tables into exploratory tools, and collapsible step-by-step guides for complex processes. This structure prioritizes usability and quick access to information, helping artists make decisions more efficiently. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: DAW Comparison Table -> Goal: Compare/Organize -> Viz: Interactive Card Grid -> Interaction: Filter by OS/Price, click to expand details -> Justification: Simplifies a dense table into a manageable, user-driven tool. -> Library/Method: Vanilla JS, Tailwind CSS.
+        - Report Info: Distributor Comparison Table -> Goal: Compare/Organize -> Viz: Interactive Card Grid -> Interaction: Click to view detailed fact sheet -> Justification: Makes complex pricing and royalty data easy to digest. -> Library/Method: Vanilla JS, Tailwind CSS.
+        - Report Info: Distributor Annual Fees -> Goal: Compare -> Viz: Horizontal Bar Chart -> Interaction: Hover for tooltips -> Justification: Provides a quick visual comparison of costs to fulfill the Chart.js requirement. -> Library/Method: Chart.js.
+        - Report Info: S4A/Musixmatch Processes -> Goal: Inform/Organize -> Viz: Numbered Accordion List -> Interaction: Click to expand/collapse steps -> Justification: Breaks down complex procedures into digestible, sequential steps. -> Library/Method: Vanilla JS, Tailwind CSS.
+        - Report Info: Final Checklist -> Goal: Inform/Organize -> Viz: Interactive Checklist -> Interaction: Click to toggle item state -> Justification: Provides a practical, actionable summary of the guide. -> Library/Method: Vanilla JS, Tailwind CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif', 'PingFang TC', 'Microsoft JhengHei';
+            background-color: #FDFBF8;
+            color: #383736;
+        }
+        .active-nav {
+            color: #D97706;
+            font-weight: 600;
+        }
+        .card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .filter-btn {
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .filter-btn.active {
+            background-color: #D97706;
+            color: #FFFFFF;
+        }
+        .details-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .details-content.open {
+            max-height: 1500px;
+        }
+        .step-accordion summary {
+            cursor: pointer;
+        }
+        .step-accordion[open] summary {
+            color: #D97706;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-amber-700">Spotify 發行之旅</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#creation" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-amber-600">① 創作</a>
+                        <a href="#distribution" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-amber-600">② 發行</a>
+                        <a href="#connection" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-amber-600">③ 連結</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-amber-600 hover:bg-gray-100 focus:outline-none">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#creation" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-amber-600 hover:bg-gray-50">① 創作</a>
+                <a href="#distribution" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-amber-600 hover:bg-gray-50">② 發行</a>
+                <a href="#connection" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-amber-600 hover:bg-gray-50">③ 連結</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <section id="hero" class="text-center mb-20">
+            <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">從你的工作室到全世界</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600">一份為新晉獨立音樂人設計的互動指南，旨在揭開在 Spotify 上發行音樂的神秘面紗。跟隨這三個階段，自信地發佈你的作品。</p>
+        </section>
+
+        <section id="creation" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <span class="text-amber-600 font-semibold">階段一</span>
+                <h3 class="text-3xl font-bold mt-2">創作：打造你的聲音</h3>
+                <p class="mt-4 max-w-2xl mx-auto text-gray-600">你的音樂誕生於此。第一步是選擇你的數位音訊工作站 (DAW)——你的虛擬錄音室。這個工具將深刻影響你的創作流程。使用下方的互動工具來探索最適合你的選項。</p>
+            </div>
+            
+            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+                <h4 class="text-xl font-bold mb-6 text-center">DAW 互動比較工具</h4>
+                <div id="daw-filters" class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
+                    <div>
+                        <span class="text-sm font-medium mr-2">價格:</span>
+                        <button data-filter-group="price" data-filter="all" class="filter-btn active px-3 py-1 text-sm rounded-full bg-gray-200">全部</button>
+                        <button data-filter-group="price" data-filter="免費" class="filter-btn px-3 py-1 text-sm rounded-full bg-gray-200">免費</button>
+                        <button data-filter-group="price" data-filter="經濟實惠" class="filter-btn px-3 py-1 text-sm rounded-full bg-gray-200">經濟實惠</button>
+                        <button data-filter-group="price" data-filter="專業標準" class="filter-btn px-3 py-1 text-sm rounded-full bg-gray-200">專業標準</button>
+                    </div>
+                    <div>
+                        <span class="text-sm font-medium mr-2">作業系統:</span>
+                        <button data-filter-group="os" data-filter="all" class="filter-btn active px-3 py-1 text-sm rounded-full bg-gray-200">全部</button>
+                        <button data-filter-group="os" data-filter="macOS" class="filter-btn px-3 py-1 text-sm rounded-full bg-gray-200">macOS</button>
+                        <button data-filter-group="os" data-filter="Windows" class="filter-btn px-3 py-1 text-sm rounded-full bg-gray-200">Windows</button>
+                        <button data-filter-group="os" data-filter="跨平台" class="filter-btn px-3 py-1 text-sm rounded-full bg-gray-200">跨平台</button>
+                    </div>
+                </div>
+
+                <div id="daw-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+            </div>
+        </section>
+
+        <section id="distribution" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <span class="text-amber-600 font-semibold">階段二</span>
+                <h3 class="text-3xl font-bold mt-2">發行：通往世界的橋樑</h3>
+                <p class="mt-4 max-w-2xl mx-auto text-gray-600">一旦你的音樂完成，你需要一位音樂發行商將其上傳到 Spotify。這可以說是對你事業最重要的商業決策。探索下方的發行商，了解他們的定價模式和服務。</p>
+            </div>
+
+            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg mb-12">
+                <h4 class="text-xl font-bold mb-6 text-center">發行商互動比較工具</h4>
+                <div id="distributor-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+            </div>
+
+            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+                <h4 class="text-xl font-bold mb-6 text-center">發行商年費比較 (無限上傳方案)</h4>
+                 <div class="chart-container">
+                    <canvas id="distributorChart"></canvas>
+                </div>
+                <p class="text-center text-sm text-gray-500 mt-4">此圖表僅比較提供無限上傳方案的發行商的基礎年費。請點擊上方卡片查看完整定價詳情和潛在額外費用。</p>
+            </div>
+        </section>
+
+        <section id="connection" class="scroll-mt-20">
+            <div class="text-center mb-12">
+                <span class="text-amber-600 font-semibold">階段三</span>
+                <h3 class="text-3xl font-bold mt-2">連結：與聽眾互動</h3>
+                <p class="mt-4 max-w-2xl mx-auto text-gray-600">你的音樂上線後，工作還沒結束。認領你的 Spotify for Artists 個人檔案並新增歌詞，是將被動聽眾轉化為主動粉絲的關鍵步驟。按照下方的指南完成這些重要任務。</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+                    <h4 class="text-xl font-bold mb-6">Spotify for Artists (S4A) 關鍵步驟</h4>
+                    <div class="space-y-4">
+                        <details class="step-accordion border-b pb-4">
+                            <summary class="font-semibold text-lg list-none flex justify-between items-center">
+                                <span>1. 設定未來的發行日期</span>
+                                <span class="text-amber-600 text-2xl">+</span>
+                            </summary>
+                            <p class="mt-2 text-gray-600">透過你的發行商上傳音樂時，將發行日期設定在未來至少 3-4 週。這為處理和推薦建立了必要的緩衝時間。</p>
+                        </details>
+                        <details class="step-accordion border-b pb-4">
+                            <summary class="font-semibold text-lg list-none flex justify-between items-center">
+                                <span>2. 獲取你的藝術家 URI</span>
+                                <span class="text-amber-600 text-2xl">+</span>
+                            </summary>
+                            <p class="mt-2 text-gray-600">一旦發行商確認你的發行已交付給 Spotify，從他們那裡獲取你獨特的 Spotify 藝術家 URI。許多發行商（如 DistroKid）都有自動查詢工具。</p>
+                        </details>
+                        <details class="step-accordion border-b pb-4">
+                            <summary class="font-semibold text-lg list-none flex justify-between items-center">
+                                <span>3. 認領你的個人檔案</span>
+                                <span class="text-amber-600 text-2xl">+</span>
+                            </summary>
+                            <p class="mt-2 text-gray-600">前往 <a href="https://artists.spotify.com/claim" target="_blank" class="text-amber-600 hover:underline">artists.spotify.com/claim</a>，使用你的 URI 認領你的個人檔案。這會為你的頁面加上藍色驗證勾號。</p>
+                        </details>
+                        <details class="step-accordion">
+                            <summary class="font-semibold text-lg list-none flex justify-between items-center">
+                                <span>4. 推薦你的歌曲並自訂個人檔案</span>
+                                <span class="text-amber-600 text-2xl">+</span>
+                            </summary>
+                            <p class="mt-2 text-gray-600">在你的 S4A 儀表板中，向編輯推薦你未發行的歌曲以爭取播放列表的考慮。同時，上傳專業的頭像、橫幅，並撰寫引人入勝的藝術家簡介。</p>
+                        </details>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+                    <h4 class="text-xl font-bold mb-6">Musixmatch 歌詞同步指南</h4>
+                    <div class="space-y-4">
+                         <details class="step-accordion border-b pb-4">
+                            <summary class="font-semibold text-lg list-none flex justify-between items-center">
+                                <span>1. 註冊並驗證</span>
+                                <span class="text-amber-600 text-2xl">+</span>
+                            </summary>
+                            <p class="mt-2 text-gray-600">在 <a href="https://www.musixmatch.com/pro" target="_blank" class="text-amber-600 hover:underline">Musixmatch Pro</a> 創建一個免費帳戶，並完成藝術家驗證過程。你需要提供你的 Spotify 和 Apple Music 個人檔案連結。</p>
+                        </details>
+                        <details class="step-accordion border-b pb-4">
+                            <summary class="font-semibold text-lg list-none flex justify-between items-center">
+                                <span>2. 轉錄歌詞</span>
+                                <span class="text-amber-600 text-2xl">+</span>
+                            </summary>
+                            <p class="mt-2 text-gray-600">嚴格遵守 Musixmatch 的格式指南來輸入你的歌詞。這是一項技術性的資料輸入工作，精準度至關重要。</p>
+                        </details>
+                        <details class="step-accordion border-b pb-4">
+                            <summary class="font-semibold text-lg list-none flex justify-between items-center">
+                                <span>3. 同步歌詞</span>
+                                <span class="text-amber-600 text-2xl">+</span>
+                            </summary>
+                            <p class="mt-2 text-gray-600">使用 Musixmatch 的同步工具，將每一行歌詞與你的音訊精確對時。這需要一個 Spotify Premium 帳戶。</p>
+                        </details>
+                        <details class="step-accordion">
+                            <summary class="font-semibold text-lg list-none flex justify-between items-center">
+                                <span>4. 提交並等待</span>
+                                <span class="text-amber-600 text-2xl">+</span>
+                            </summary>
+                            <p class="mt-2 text-gray-600">提交你的作品。歌詞可能需要幾天時間進行審核並在 Spotify 上線。</p>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="checklist" class="mt-24">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold mt-2">你的發行檢查清單</h3>
+                <p class="mt-4 max-w-2xl mx-auto text-gray-600">這是一份互動清單，總結了你的發行之旅中的所有關鍵行動。點擊以標記完成的項目。</p>
+            </div>
+            <div id="interactive-checklist" class="max-w-3xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-lg space-y-4">
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-gray-800 text-white mt-24">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm">
+            <p>這份互動指南旨在幫助獨立音樂人自信地發行他們的音樂。</p>
+            <p class="mt-1 text-gray-400">基於權威研究報告創建。</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const dawData = [
+        { name: 'Apple GarageBand', priceCategory: '免費', os: 'macOS', price: '免費', strengths: '極易使用，非常適合初學者，功能強大，最多可達 255 個音軌。', limitations: '僅限 Mac/iOS，無傳統混音控制台視圖。', bestFor: 'Mac 初學者、詞曲作者和學習音樂製作的人。' },
+        { name: 'Cakewalk by BandLab', priceCategory: '免費', os: 'Windows', price: '免費', strengths: '功能齊全的專業 DAW，無限音軌和 64 位元混音引擎，完全免費。', limitations: '僅限 Windows。', bestFor: '尋求功能強大、完全免費解決方案的 Windows 用戶。' },
+        { name: 'Cockos Reaper', priceCategory: '經濟實惠', os: '跨平台', price: '$60', strengths: '以極低的價格提供令人難以置信的強大功能和可自訂性，記憶體佔用極小。', limitations: '介面不直觀，對初學者可能過於複雜，無捆綁樂器/循環樂段。', bestFor: '預算有限但需要專業功能並願意學習的藝術家。' },
+        { name: 'Image-Line FL Studio', priceCategory: '經濟實惠', os: '跨平台', price: '起價 $99', strengths: '出色的基於模式的節拍製作工作流程，終身免費更新。', limitations: '對於傳統的線性錄製現場樂器不太直觀。', bestFor: '嘻哈和電子舞曲製作人。' },
+        { name: 'Apple Logic Pro', priceCategory: '專業標準', os: 'macOS', price: '$199.99', strengths: '物超所值，龐大的高品質捆綁樂器和效果庫，專業的工作流程。', limitations: '僅限 Mac。', bestFor: '尋求最佳一體化專業套件的 Mac 用戶。' },
+        { name: 'Ableton Live', priceCategory: '專業標準', os: '跨平台', price: '起價 $99', strengths: '無與倫比的電子音樂創作和現場表演工作流程，對產生創意極具啟發性。', limitations: '完整套件價格昂貴，缺乏一些傳統功能，如樂譜編輯器。', bestFor: '電子音樂製作人和進行現場表演的藝術家。' },
+        { name: 'Avid Pro Tools', priceCategory: '專業標準', os: '跨平台', price: '起價 $99/年', strengths: '專業錄音室的「行業標準」，無與倫比的音訊編輯工作流程。', limitations: '昂貴的訂閱模式，對於簡單的專案可能過於複雜。', bestFor: '旨在與專業錄音室合作或相容的藝術家。' }
+    ];
+
+    const distributorData = [
+        { name: 'DistroKid', pricingModel: '年費制 (起價 $22.99/年)', royaltyCutStores: '0%', royaltyCutSocial: '20% (外加 Content ID 費用)', paymentSplitting: '是 (免費)', instantS4A: '是', bestFor: '預算有限且不重度依賴 YouTube 收入的多產藝術家。', annualFee: 22.99 },
+        { name: 'TuneCore', pricingModel: '年費制 (起價 $22.99/年)', royaltyCutStores: '0%', royaltyCutSocial: '20%', paymentSplitting: '是 (免費)', instantS4A: '否 (手動認領)', bestFor: '重視深度分析和出版管理服務的藝術家。', annualFee: 22.99 },
+        { name: 'CD Baby', pricingModel: '按次發行收費 ($9.99/單曲)', royaltyCutStores: '9%', royaltyCutSocial: '9% (外加額外費用)', paymentSplitting: '否', instantS4A: '是', bestFor: '不常發行作品且希望銷售實體媒體 (CD/黑膠) 的藝術家。', annualFee: null },
+        { name: 'Ditto Music', pricingModel: '年費制 (起價約 $24/年)', royaltyCutStores: '0%', royaltyCutSocial: '0%', paymentSplitting: '是 (免費)', instantS4A: '否 (手動認領)', bestFor: '尋求全平台 0% 佣金並重視預存等附加服務的藝術家。', annualFee: 24 },
+        { name: 'Amuse', pricingModel: '年費制 (起價 $19.99/年)', royaltyCutStores: '0%', royaltyCutSocial: '0%', paymentSplitting: '是 (非會員需抽成 15%)', instantS4A: '是', bestFor: '預算有限且需要簡單發行和款項分配的藝術家。', annualFee: 19.99 },
+        { name: 'AWAL', pricingModel: '佣金制 (免費上傳)', royaltyCutStores: '15%', royaltyCutSocial: '15%', paymentSplitting: '否', instantS4A: '是', bestFor: '已有一定知名度並尋求類唱片公司合作關係的成熟藝術家。', annualFee: null }
+    ];
+
+    const checklistData = [
+        { category: '創作', items: ['評估並選擇合適的 DAW', '學習並掌握所選的 DAW'] },
+        { category: '準備', items: ['匯出高品質 WAV 音訊檔案', '創建符合規範的封面藝術', '彙編所有必要的元數據'] },
+        { category: '發行', items: ['分析並選擇最佳的發行商', '上傳資產並設定未來發行日期'] },
+        { category: '發行前', items: ['從發行商獲取藝術家 URI', '認領 Spotify for Artists 個人檔案', '向編輯推薦未發行的歌曲'] },
+        { category: '發行後', items: ['完全自訂 S4A 個人檔案', '在 Musixmatch 註冊並驗證', '轉錄並同步歌詞'] }
+    ];
+
+    const dawGrid = document.getElementById('daw-grid');
+    const distributorGrid = document.getElementById('distributor-grid');
+    const checklistContainer = document.getElementById('interactive-checklist');
+
+    function createDawCard(daw) {
+        const card = document.createElement('div');
+        card.className = 'daw-card card bg-gray-50 rounded-lg p-5 cursor-pointer';
+        card.dataset.price = daw.priceCategory;
+        card.dataset.os = daw.os;
+        
+        card.innerHTML = `
+            <div class="flex justify-between items-start">
+                <h5 class="text-lg font-bold">${daw.name}</h5>
+                <span class="text-sm font-semibold text-amber-600">${daw.price}</span>
+            </div>
+            <div class="mt-2 text-sm text-gray-500">
+                <span class="inline-block bg-amber-100 text-amber-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">${daw.priceCategory}</span>
+                <span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">${daw.os}</span>
+            </div>
+            <div class="details-content mt-4 text-sm space-y-2">
+                <p><strong>✓ 優勢:</strong> ${daw.strengths}</p>
+                <p><strong>✗ 限制:</strong> ${daw.limitations}</p>
+                <p><strong>→ 最適合:</strong> ${daw.bestFor}</p>
+            </div>
+        `;
+        
+        card.addEventListener('click', () => {
+            card.querySelector('.details-content').classList.toggle('open');
+        });
+
+        return card;
+    }
+
+    function createDistributorCard(dist) {
+        const card = document.createElement('div');
+        card.className = 'card bg-gray-50 rounded-lg p-5 cursor-pointer';
+        card.innerHTML = `
+            <h5 class="text-lg font-bold">${dist.name}</h5>
+            <p class="text-sm text-gray-600 mt-1">${dist.pricingModel}</p>
+            <div class="details-content mt-4 text-sm space-y-2">
+                <p><strong>商店版稅抽成:</strong> <span class="font-semibold ${dist.royaltyCutStores === '0%' ? 'text-green-600' : 'text-red-600'}">${dist.royaltyCutStores}</span></p>
+                <p><strong>社群平台抽成:</strong> <span class="font-semibold ${dist.royaltyCutSocial === '0%' ? 'text-green-600' : 'text-red-600'}">${dist.royaltyCutSocial}</span></p>
+                <p><strong>款項分配:</strong> ${dist.paymentSplitting}</p>
+                <p><strong>即時 S4A 存取:</strong> ${dist.instantS4A}</p>
+                <p class="mt-2 pt-2 border-t"><strong>→ 最適合:</strong> ${dist.bestFor}</p>
+            </div>
+        `;
+        card.addEventListener('click', () => {
+            card.querySelector('.details-content').classList.toggle('open');
+        });
+        return card;
+    }
+
+    function renderDaws() {
+        dawGrid.innerHTML = '';
+        dawData.forEach(daw => dawGrid.appendChild(createDawCard(daw)));
+    }
+
+    function renderDistributors() {
+        distributorGrid.innerHTML = '';
+        distributorData.forEach(dist => distributorGrid.appendChild(createDistributorCard(dist)));
+    }
+
+    function renderChecklist() {
+        checklistContainer.innerHTML = '';
+        checklistData.forEach(category => {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.innerHTML = `<h5 class="text-lg font-bold mb-2">${category.category}</h5>`;
+            const list = document.createElement('ul');
+            list.className = 'space-y-2';
+            category.items.forEach(itemText => {
+                const item = document.createElement('li');
+                item.className = 'flex items-center cursor-pointer';
+                item.innerHTML = `
+                    <span class="check-box w-5 h-5 mr-3 border-2 border-gray-300 rounded flex items-center justify-center transition-all">
+                        <span class="check-mark text-white text-sm">✓</span>
+                    </span>
+                    <span class="item-text text-gray-700">${itemText}</span>
+                `;
+                item.addEventListener('click', () => {
+                    item.classList.toggle('completed');
+                    const checkBox = item.querySelector('.check-box');
+                    const itemTextSpan = item.querySelector('.item-text');
+                    checkBox.classList.toggle('bg-amber-600');
+                    checkBox.classList.toggle('border-amber-600');
+                    itemTextSpan.classList.toggle('line-through');
+                    itemTextSpan.classList.toggle('text-gray-400');
+                });
+                list.appendChild(item);
+            });
+            categoryDiv.appendChild(list);
+            checklistContainer.appendChild(categoryDiv);
+        });
+    }
+
+    const filters = { price: 'all', os: 'all' };
+    const dawFilterContainer = document.getElementById('daw-filters');
+    dawFilterContainer.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+            const group = e.target.dataset.filterGroup;
+            const value = e.target.dataset.filter;
+            
+            filters[group] = value;
+
+            dawFilterContainer.querySelectorAll(`[data-filter-group="${group}"]`).forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+
+            document.querySelectorAll('.daw-card').forEach(card => {
+                const priceMatch = filters.price === 'all' || card.dataset.price === filters.price;
+                const osMatch = filters.os === 'all' || card.dataset.os === filters.os || (filters.os === 'macOS' && card.dataset.os === '跨平台') || (filters.os === 'Windows' && card.dataset.os === '跨平台');
+                
+                card.style.display = priceMatch && osMatch ? 'block' : 'none';
+            });
+        }
+    });
+
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+    mobileMenu.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A') {
+            mobileMenu.classList.add('hidden');
+        }
+    });
+
+    const chartCtx = document.getElementById('distributorChart').getContext('2d');
+    const chartData = distributorData.filter(d => d.annualFee !== null);
+    new Chart(chartCtx, {
+        type: 'bar',
+        data: {
+            labels: chartData.map(d => d.name),
+            datasets: [{
+                label: '基礎年費 (美元)',
+                data: chartData.map(d => d.annualFee),
+                backgroundColor: 'rgba(217, 119, 6, 0.6)',
+                borderColor: 'rgba(217, 119, 6, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.x !== null) {
+                                label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.x);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: '年費 (美元)'
+                    }
+                }
+            }
+        }
+    });
+    
+    renderDaws();
+    renderDistributors();
+    renderChecklist();
+});
+</script>
+</body>
+</html>

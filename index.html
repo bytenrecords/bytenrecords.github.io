@@ -89,24 +89,23 @@
         const currentYear = new Date().getFullYear();
         document.getElementById('current-year').textContent = currentYear;
 
-        const postsList = document.getElementById('posts-list');
-        const posts = [
-            { file: "流行歌曲創作必備知識總結.md", title: "流行歌曲創作必備知識總結" },
-            { file: "chinese-hip-hop-rnb-data-dashboard.html", title: "華語嘻哈R&B數據儀表板", isExternal: true }
+        const postsData = [
+          {
+            "title": "獨立音樂人 Spotify 發行指南",
+            "url": "posts/獨立音樂人 Spotify 發行指南.html",
+            "date": "2025-07-30"
+          },
+          {
+            "title": "Chinese Hip-hop/R&B Data Dashboard",
+            "url": "posts/chinese-hip-hop-rnb-data-dashboard.html",
+            "date": "2025-07-30"
+          },
+          {
+            "title": "流行歌曲創作必備知識總結",
+            "url": "posts/流行歌曲創作必備知識總結.html",
+            "date": "2025-07-30"
+          }
         ];
-
-        posts.forEach(post => {
-            const postLink = document.createElement('a');
-            if (post.isExternal) {
-                postLink.href = `posts/${post.file}`;
-                postLink.target = '_blank'; // Open in new tab
-            } else {
-                postLink.href = `post.html?post=${encodeURIComponent(post.file)}`;
-            }
-            postLink.className = 'list-group-item list-group-item-action';
-            postLink.textContent = post.title;
-            postsList.appendChild(postLink);
-        });
     </script>
     <script src="main.js"></script>
 </body>
