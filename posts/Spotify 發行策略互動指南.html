@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify 發行策略互動指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The SPA is designed as a top-to-bottom "Playbook" for artists. It's structured into four thematic sections: 1. "Why It Matters" (hook with market data), 2. "The Friday Advantage" (interactive explanation of the core strategy), 3. "Your Release Timeline" (a practical, step-by-step action plan), and 4. "Beyond the Release" (long-term data analysis and growth). This structure guides the user from understanding the problem to implementing the solution and planning for the future, which is more intuitive and actionable than the original report's academic layout. -->
+    <!-- Visualization & Content Choices: Report Info -> Goal -> Viz/Presentation -> Interaction -> Justification. 1. Indie Market Share -> Inform -> Donut Chart (Chart.js) -> Hover for details -> Visually impactful way to show a key stat. 2. Algorithm & User Habits -> Explain/Compare -> Interactive Diagram (HTML/JS) + Bar Chart (Chart.js) -> Hover/Click to link concepts -> Simplifies the core logic of "why Friday" by visually connecting two separate ideas. 3. Release Steps -> Organize/Guide -> Clickable Timeline (HTML/JS) -> Click to expand -> Presents a clean overview while allowing users to drill down for details. 4. Post-Release Metrics -> Analyze -> Toggable Bar Chart (Chart.js) -> Button to switch views -> Allows comparison of different data points (e.g., listener types vs. stream ratios) within a single compact visualization. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #F8F7F4;
+            color: #2E3440;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #5E81AC;
+            border-bottom-color: #5E81AC;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            max-height: 400px;
+            height: 60vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 19px;
+            width: 2px;
+            height: calc(100% + 2rem);
+            background-color: #D8DEE9;
+            z-index: 0;
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        .timeline-dot {
+            position: absolute;
+            top: 20px;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #5E81AC;
+            border: 3px solid #F8F7F4;
+            z-index: 1;
+        }
+        .expand-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-[#2E3440]">Spotify 發行天書</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#intro" class="nav-link px-3 py-2 rounded-md text-sm font-medium">為何重要</a>
+                        <a href="#advantage" class="nav-link px-3 py-2 rounded-md text-sm font-medium">週五優勢</a>
+                        <a href="#timeline" class="nav-link px-3 py-2 rounded-md text-sm font-medium">發行時間軸</a>
+                        <a href="#growth" class="nav-link px-3 py-2 rounded-md text-sm font-medium">長期成長</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <section id="intro" class="text-center py-16">
+            <h2 class="text-4xl font-bold tracking-tight sm:text-5xl text-[#2E3440]">掌握發行策略，引爆你的音樂</h2>
+            <p class="mt-6 text-lg leading-8 text-gray-600 max-w-3xl mx-auto">在數位音樂時代，發行日的選擇不再只是行政安排，而是影響歌曲能否被演算法推薦、觸及目標聽眾的關鍵決策。本指南將帶你深入了解 Spotify 的遊戲規則，找到最佳發行時機。</p>
+            <div class="mt-12">
+                <h3 class="text-2xl font-bold mb-4">獨立音樂正在崛起</h3>
+                <p class="text-gray-600 max-w-2xl mx-auto mb-8">數據顯示，獨立音樂在 Spotify 上的市佔率持續攀升，這意味著只要策略正確，每個音樂人都有機會脫穎而出。</p>
+                <div class="chart-container max-w-md">
+                    <canvas id="marketShareChart"></canvas>
+                </div>
+                 <p class="mt-4 text-sm text-gray-500">資料來源：2024上半年美國市場數據</p>
+            </div>
+        </section>
+
+        <hr class="my-16 border-gray-200">
+
+        <section id="advantage" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">星期五的絕對優勢</h2>
+                <p class="mt-4 text-lg leading-8 text-gray-600 max-w-3xl mx-auto">為什麼星期五是業界公認的最佳發歌日？答案在於「演算法週期」與「用戶習慣」的完美結合。這兩股力量在星期五交會，為新歌創造最大的曝光機會。</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-6">Spotify 的演算法時鐘</h3>
+                    <p class="text-center text-gray-600 mb-8">Spotify 的核心推薦機制在每週五進行關鍵更新。點擊下方項目了解更多。</p>
+                    <div class="space-y-4 text-center">
+                        <button class="interactive-item w-full bg-blue-100 text-blue-800 p-4 rounded-lg font-semibold hover:bg-blue-200 transition" data-content="<h4 class='font-bold text-lg mb-2'>Release Radar (發行雷達)</h4><p>每週五更新，向你的關注者和你潛在的粉絲推薦你的新歌。這是新歌首週曝光最重要的管道之一。前提是：你必須提前至少7天提交！</p>">Release Radar 更新</button>
+                        <button class="interactive-item w-full bg-green-100 text-green-800 p-4 rounded-lg font-semibold hover:bg-green-200 transition" data-content="<h4 class='font-bold text-lg mb-2'>編輯精選播放列表</h4><p>例如 New Music Friday 等高流量列表也在週五更新。被選入能帶來巨大初始流量，並為演算法提供強力的正面信號。</p>">編輯播放列表更新</button>
+                        <button class="interactive-item w-full bg-purple-100 text-purple-800 p-4 rounded-lg font-semibold hover:bg-purple-200 transition" data-content="<h4 class='font-bold text-lg mb-2'>Discover Weekly (探索週刊)</h4><p>雖然它在週一更新，但其推薦內容高度依賴你歌曲在前一個週末（週五發行後）的表現數據。好的首週表現會讓你的歌更容易出現在這裡。</p>">Discover Weekly 數據收集</button>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-center mb-6">聽眾的收聽熱度圖</h3>
+                     <p class="text-center text-gray-600 mb-8">用戶的聽歌行為有明顯的週期性。週末是他們探索新音樂的高峰期，這與 Spotify 的更新週期完美契合。</p>
+                    <div class="chart-container max-w-lg h-80">
+                        <canvas id="userActivityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-16 border-gray-200">
+
+        <section id="timeline" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">你的發行時間軸</h2>
+                <p class="mt-4 text-lg leading-8 text-gray-600 max-w-3xl mx-auto">成功的發行是一場精心策劃的戰役。遵循這個時間軸，確保你在每個關鍵節點都做對了事。</p>
+            </div>
+            <div class="max-w-3xl mx-auto">
+                <div class="relative space-y-8">
+                    <div class="timeline-item pl-12 relative">
+                        <div class="timeline-dot"></div>
+                        <h3 class="text-xl font-bold cursor-pointer timeline-title">發行前 2-4 週：策略規劃</h3>
+                        <div class="expand-content text-gray-600 mt-2 space-y-2">
+                            <p>✓ <strong>完成母帶：</strong> 確保你的歌曲音質達到專業標準。</p>
+                            <p>✓ <strong>準備宣傳材料：</strong> 設計封面、拍攝宣傳照、製作 Canvas 影片。</p>
+                            <p>✓ <strong>設定預存連結：</strong> 透過發行商設定 Pre-save，這是累積初始動能的關鍵。</p>
+                            <p>✓ <strong>聯繫媒體/策展人：</strong> 開始向音樂部落格、播放列表策展人推介你的歌曲。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item pl-12 relative">
+                        <div class="timeline-dot"></div>
+                        <h3 class="text-xl font-bold cursor-pointer timeline-title">發行前 7 天：提交！</h3>
+                        <div class="expand-content text-gray-600 mt-2 space-y-2">
+                            <p>✓ <strong>提交至 Spotify for Artists：</strong> 這是最重要的步驟！登入你的 Spotify for Artists 帳戶，提交你的歌曲給編輯審核。這能確保你有機會被選入編輯播放列表，並且有資格進入 Release Radar。</p>
+                            <p>✓ <strong>確保「未聽過」狀態：</strong> 不要在任何公開平台完整發布你的歌曲，以保持其在 Release Radar 中的「新鮮度」。</p>
+                            <p>✓ <strong>加強預存宣傳：</strong> 舉辦預存競賽或提供獨家內容，最大化預存數量。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item pl-12 relative">
+                        <div class="timeline-dot"></div>
+                        <h3 class="text-xl font-bold cursor-pointer timeline-title">發行日 (星期五)：全面啟動</h3>
+                        <div class="expand-content text-gray-600 mt-2 space-y-2">
+                            <p>✓ <strong>分享發行連結：</strong> 在所有社群媒體上分享你的 Spotify 連結。</p>
+                            <p>✓ <strong>更新你的 Spotify 檔案：</strong> 將新歌設為「藝人之選」(Artist Pick)，更新你的簡介和 Canvas。</p>
+                            <p>✓ <strong>與粉絲互動：</strong> 回應留言，感謝分享，鼓勵他們將歌曲加入自己的播放列表。</p>
+                            <p>✓ <strong>檢查 Release Radar：</strong> 看看你的歌曲是否出現在粉絲的 Release Radar 中。</p>
+                        </div>
+                    </div>
+                     <div class="timeline-item pl-12 relative">
+                        <div class="timeline-dot"></div>
+                        <h3 class="text-xl font-bold cursor-pointer timeline-title">發行後 1-4 週：數據監測與優化</h3>
+                        <div class="expand-content text-gray-600 mt-2 space-y-2">
+                            <p>✓ <strong>追蹤即時數據：</strong> 在發行後首週，密切關注 Spotify for Artists 的即時串流數據。</p>
+                            <p>✓ <strong>分析聽眾來源：</strong> 了解你的聽眾是來自「主動收聽」還是「程式化收聽」，並制定策略將後者轉化為前者。</p>
+                            <p>✓ <strong>考慮 Discovery Mode：</strong> 如果數據表現良好，可以考慮使用 Discovery Mode 來擴大觸及。</p>
+                            <p>✓ <strong>持續宣傳：</strong> 音樂的生命週期很長，持續在社群媒體上創造內容，維持熱度。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <hr class="my-16 border-gray-200">
+
+        <section id="growth" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">超越發行：數據驅動的長期成長</h2>
+                <p class="mt-4 text-lg leading-8 text-gray-600 max-w-3xl mx-auto">單曲的成功只是起點。學會解讀數據，培養忠實粉絲，才能建立可持續的音樂事業。</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="flex justify-center mb-6">
+                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                        <button type="button" id="showListenerTypes" class="data-toggle-btn active px-4 py-2 text-sm font-medium text-white bg-[#5E81AC] border border-gray-200 rounded-l-lg">聽眾類型分析</button>
+                        <button type="button" id="showStreamRatio" class="data-toggle-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100">串流聽眾比</button>
+                    </div>
+                </div>
+                <div class="chart-container max-w-3xl">
+                    <canvas id="growthChart"></canvas>
+                </div>
+                <div id="chart-explanation" class="mt-4 text-center text-gray-600 max-w-2xl mx-auto"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+            <p>本指南基於公開研究報告製作，旨在提供策略參考。</p>
+            <p class="text-sm text-gray-400 mt-2">&copy; 2024 互動式發行策略指南</p>
+        </div>
+    </footer>
+
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full mx-4">
+            <div id="modal-content"></div>
+            <button id="close-modal" class="mt-6 w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-800 transition">關閉</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const marketShareData = {
+                labels: ['獨立音樂發行 (62.1%)', '其他 (37.9%)'],
+                datasets: [{
+                    data: [62.1, 37.9],
+                    backgroundColor: ['#5E81AC', '#D8DEE9'],
+                    hoverBackgroundColor: ['#81A1C1', '#E5E9F0'],
+                    borderColor: '#F8F7F4',
+                    borderWidth: 4
+                }]
+            };
+            const marketShareCtx = document.getElementById('marketShareChart').getContext('2d');
+            new Chart(marketShareCtx, {
+                type: 'doughnut',
+                data: marketShareData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#4C566A',
+                                font: { size: 14 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const userActivityData = {
+                labels: ['一', '二', '三', '四', '五', '六', '日'],
+                datasets: [{
+                    label: '聽眾活躍度',
+                    data: [65, 68, 72, 75, 95, 100, 90],
+                    backgroundColor: '#A3BE8C',
+                    borderColor: '#8FBCBB',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            };
+            const userActivityCtx = document.getElementById('userActivityChart').getContext('2d');
+            new Chart(userActivityCtx, {
+                type: 'bar',
+                data: userActivityData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: '每週用戶聽歌活躍度（示意圖）',
+                            color: '#4C566A'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#4C566A' }
+                        },
+                        x: {
+                            ticks: { color: '#4C566A' }
+                        }
+                    }
+                }
+            });
+
+            const growthChartCtx = document.getElementById('growthChart').getContext('2d');
+            let growthChart;
+            const listenerTypesData = {
+                labels: ['歌曲 A', '歌曲 B', '歌曲 C'],
+                datasets: [{
+                    label: '主動聽眾',
+                    data: [5000, 8000, 6500],
+                    backgroundColor: '#5E81AC',
+                }, {
+                    label: '程式化聽眾',
+                    data: [15000, 12000, 18000],
+                    backgroundColor: '#D8DEE9',
+                }]
+            };
+            const streamRatioData = {
+                labels: ['歌曲 A', '歌曲 B', '歌曲 C'],
+                datasets: [{
+                    label: '串流次數',
+                    data: [80000, 150000, 95000],
+                    backgroundColor: '#88C0D0',
+                }, {
+                    label: '不重複聽眾',
+                    data: [20000, 20000, 24500],
+                    backgroundColor: '#B48EAD',
+                }]
+            };
+            const chartExplanationEl = document.getElementById('chart-explanation');
+            
+            function createGrowthChart(data, explanation) {
+                if (growthChart) {
+                    growthChart.destroy();
+                }
+                growthChart = new Chart(growthChartCtx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, ticks: { color: '#4C566A' } },
+                            x: { ticks: { color: '#4C566A' } }
+                        },
+                        plugins: {
+                            legend: { position: 'top', labels: { color: '#4C566A' } }
+                        }
+                    }
+                });
+                chartExplanationEl.textContent = explanation;
+            }
+            
+            const listenerTypesExplanation = "目標是將「程式化聽眾」轉化為「主動聽眾」。主動聽眾是你的忠實粉絲，他們的留存率和長期價值遠高於前者。";
+            const streamRatioExplanation = "健康的「串流/聽眾比」表示聽眾在反覆播放你的歌曲，這是高參與度的強力信號，對演算法非常有利。歌曲 B 的比例最高，表現最優。";
+
+            createGrowthChart(listenerTypesData, listenerTypesExplanation);
+
+            const dataToggleBtns = document.querySelectorAll('.data-toggle-btn');
+            document.getElementById('showListenerTypes').addEventListener('click', (e) => {
+                createGrowthChart(listenerTypesData, listenerTypesExplanation);
+                dataToggleBtns.forEach(btn => btn.classList.remove('active', 'bg-[#5E81AC]', 'text-white'));
+                e.target.classList.add('active', 'bg-[#5E81AC]', 'text-white');
+            });
+            document.getElementById('showStreamRatio').addEventListener('click', (e) => {
+                createGrowthChart(streamRatioData, streamRatioExplanation);
+                dataToggleBtns.forEach(btn => btn.classList.remove('active', 'bg-[#5E81AC]', 'text-white'));
+                e.target.classList.add('active', 'bg-[#5E81AC]', 'text-white');
+            });
+            dataToggleBtns.forEach(btn => {
+                btn.addEventListener('click', e => {
+                    dataToggleBtns.forEach(b => {
+                        b.classList.remove('bg-[#5E81AC]', 'text-white');
+                        b.classList.add('bg-white', 'text-gray-900');
+                    });
+                    e.target.classList.add('bg-[#5E81AC]', 'text-white');
+                    e.target.classList.remove('bg-white', 'text-gray-900');
+                });
+            });
+
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 70) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+            navLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            const timelineTitles = document.querySelectorAll('.timeline-title');
+            timelineTitles.forEach(title => {
+                title.addEventListener('click', () => {
+                    const content = title.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        document.querySelectorAll('.expand-content').forEach(c => c.style.maxHeight = null);
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
+            });
+
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modal-content');
+            const closeModalBtn = document.getElementById('close-modal');
+            document.querySelectorAll('.interactive-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    modalContent.innerHTML = item.dataset.content;
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                });
+            });
+            closeModalBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            });
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

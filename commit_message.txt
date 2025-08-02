@@ -1,1 +1,1 @@
-feat: add dynamic post loading and convert post to html
+feat: add new post 'Spotify 聽眾數據儀表板 & 策略藍圖'
