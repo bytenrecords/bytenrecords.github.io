@@ -33,6 +33,7 @@ section {
 #intro-cta {
     border-top: none; /* remove border */
     background-color: transparent;
+    animation: fadeInUp 1s ease-out;
 }
 
 #intro-cta .lead {
@@ -62,6 +63,51 @@ section {
 .artist-description .artist-name {
     margin-bottom: 1rem;
 }
+
+/* --- Services Section Styling --- */
+#services {
+    background-color: transparent;
+}
+
+.service-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    height: 100%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.service-icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.service-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+
+.service-desc {
+    font-size: 0.95rem;
+    color: #ddd;
+    line-height: 1.6;
+}
+
 
 /* --- General & Navbar Adjustments --- */
 .navbar {
@@ -202,3 +248,23 @@ a:hover {
 #collaborations a {
     font-weight: bold;
 }
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 40px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out both;
+}
+
+.delay-1 { animation-delay: 0.2s; }
+.delay-2 { animation-delay: 0.4s; }
+.delay-3 { animation-delay: 0.6s; }
